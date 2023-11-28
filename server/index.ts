@@ -1,17 +1,16 @@
-const express = require("express");
+import express, { Express, Request, Response, NextFunction } from "express";
+import dotenv from "dotenv";
 const asyncHandler = require("express-async-handler");
 const utils = require("./utils.js");
 
-const app = express();
-const port = 3000;
+dotenv.config();
 
-const server = app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+const app: Express = express();
+const port = process.env.PORT;
 
 app.get(
   "/api/cities",
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { fileType, fileName } = req.query;
 
     let headerFileType = req.get("Content-Type");
@@ -23,15 +22,19 @@ app.get(
         fileType || headerFileType
       );
       res.json(data);
-    } catch ({ message }) {
+    } catch ({ message }: any) {
       res.send(`${message}`);
     }
   })
 );
 
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response) => {
   console.error(err.stack);
   res.status(500).send("Something broke!");
+});
+
+const server = app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
 module.exports = server;

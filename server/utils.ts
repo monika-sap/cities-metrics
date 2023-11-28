@@ -2,14 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const csvParser = require("csv-parser");
 
-const getData = async (name, type = "json", encoding = "utf-8") => {
+const getData = async (name: string, type = "json", encoding = "utf-8") => {
   if (type !== "json" && type !== "csv") {
     throw new Error("File Type not supported");
   }
 
   const fileName = `${name}.${type}`;
   const filePath = `data/${name}/${fileName}`;
-  const fullPath = path.join(__dirname, filePath);
+  const fullPath = path.join(__dirname, `../${filePath}`);
 
   const parsers = {
     json: async () => await getJSONData(fullPath, encoding),
@@ -20,33 +20,37 @@ const getData = async (name, type = "json", encoding = "utf-8") => {
   return data;
 };
 
-const getJSONData = async (filePath, encoding = "utf-8") => {
+const getJSONData = async (filePath: string, encoding = "utf-8") => {
   const data = await fs.promises.readFile(filePath, encoding);
   return JSON.parse(data);
 };
 
-const getCSVData = (filePath, options = {}, overrideOptions = false) => {
+const getCSVData = (
+  filePath: string,
+  options = {},
+  overrideOptions = false
+) => {
   const newOptions = overrideOptions
     ? options
     : {
         separator: ";",
         headers: ["name", "area", "population"],
-        mapValues: ({ header, index, value }) => {
+        mapValues: ({ header, index, value }: any) => {
           return isNaN(value) ? value : Number(value);
         },
         skipLines: 1,
         ...options,
       };
 
-  let results = [];
+  let results: any = [];
 
   return new Promise((resolve, reject) =>
     fs
       .createReadStream(filePath)
-      .on("error", (error) => reject(error))
+      .on("error", (error: Error) => reject(error))
       .pipe(csvParser(newOptions))
-      .on("error", (error) => reject(error))
-      .on("data", (data) => results.push(data))
+      .on("error", (error: Error) => reject(error))
+      .on("data", (data: any) => results.push(data))
       .on("end", () => resolve(results))
   );
 };
