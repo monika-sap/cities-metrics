@@ -2,15 +2,18 @@ const fs = require("fs");
 const path = require("path");
 const csvParser = require("csv-parser");
 
+import { City, EnrichedCity, SortDirection, SortField } from "./types";
+
 const computeDensity = (population: number, area: number) => {
   const density = population / (area * 2.58999);
   return Number(density.toFixed(2));
 };
 
-const enrich = (city: any) => ({
-  ...city,
-  density: computeDensity(Number(city.population), Number(city.area)),
-});
+const enrich = (city: City) =>
+  ({
+    ...city,
+    density: computeDensity(Number(city.population), Number(city.area)),
+  } as EnrichedCity);
 
 const getData = async (name: string, type = "json", encoding = "utf-8") => {
   if (type !== "json" && type !== "csv") {
@@ -32,9 +35,9 @@ const getData = async (name: string, type = "json", encoding = "utf-8") => {
 
 const getJSONData = async (filePath: string, encoding = "utf-8") => {
   const data = await fs.promises.readFile(filePath, encoding);
-  const parsedData = JSON.parse(data);
-  const enrichedData = parsedData.map((city: any) => enrich(city));
-  return enrichedData;
+  const parsedData = JSON.parse(data) as City[];
+  const enrichedData = parsedData.map((city: City) => enrich(city));
+  return enrichedData as EnrichedCity[];
 };
 
 const getCSVData = (
@@ -54,7 +57,7 @@ const getCSVData = (
         ...options,
       };
 
-  let results: any = [];
+  let results: EnrichedCity[] = [];
 
   return new Promise((resolve, reject) =>
     fs
@@ -62,11 +65,31 @@ const getCSVData = (
       .on("error", (error: Error) => reject(error))
       .pipe(csvParser(newOptions))
       .on("error", (error: Error) => reject(error))
-      .on("data", (city: any) => results.push(enrich(city)))
+      .on("data", (city: City) => results.push(enrich(city)))
       .on("end", () => resolve(results))
   );
 };
 
+const sortData = (
+  data: EnrichedCity[],
+  sortField: SortField,
+  sortOrder: SortDirection
+) => {
+  return data.sort((a, b) => {
+    let fieldA = a[sortField];
+    let fieldB = b[sortField];
+
+    if (typeof fieldA === "string") fieldA = fieldA.toLowerCase();
+    if (typeof fieldB === "string") fieldB = fieldB.toLowerCase();
+
+    const ascDirection = fieldA > fieldB ? 1 : -1;
+    const descDirection = fieldA < fieldB ? 1 : -1;
+
+    return sortOrder === SortDirection.DESC ? descDirection : ascDirection;
+  });
+};
+
 module.exports = {
   getData,
+  sortData,
 };

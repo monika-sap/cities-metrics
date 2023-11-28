@@ -1,5 +1,6 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import { SortDirection } from "./types";
 const asyncHandler = require("express-async-handler");
 const utils = require("./utils.js");
 
@@ -11,20 +12,30 @@ const port = process.env.PORT;
 app.get(
   "/api/cities",
   asyncHandler(async (req: Request, res: Response) => {
-    const { fileType, fileName } = req.query;
+    const { fileType, fileName, sort, order } = req.query;
 
     let headerFileType = req.get("Content-Type");
     headerFileType = headerFileType?.slice(headerFileType?.indexOf("/") + 1);
 
+    let data = [];
     try {
-      const data = await utils.getData(
+      data = await utils.getData(
         fileName || "cities",
         fileType || headerFileType
       );
-      res.json(data);
     } catch ({ message }: any) {
       res.send(`${message}`);
     }
+
+    if (!!sort) {
+      data = utils.sortData(
+        data,
+        sort,
+        ((order as string) || "").toUpperCase() || SortDirection.ASC
+      );
+    }
+
+    res.json(data);
   })
 );
 
