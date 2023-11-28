@@ -2,13 +2,13 @@
 
 A coding challenge solution
 
-## Server Setup
+## Server
 
 - server/index.js: Initializes an Express server and defines the `/api/cities` endpoint.
 
 ### Endpoints
 
-- GET `/api/cities`: Returns a list of cities. The data is read from cities.json file located in the project root.
+- GET `/api/cities`: Returns a list of cities. The data is read from cities.json file located in the project root and enriched with a population `density` field.
 
 #### Parameters
 
