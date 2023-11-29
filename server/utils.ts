@@ -15,7 +15,11 @@ const enrich = (city: City) =>
     density: computeDensity(Number(city.population), Number(city.area)),
   } as EnrichedCity);
 
-const getData = async (name: string, type = "json", encoding = "utf-8") => {
+export const getData = async (
+  name = "cities",
+  type = "json",
+  encoding = "utf-8"
+) => {
   if (type !== "json" && type !== "csv") {
     throw new Error("File Type not supported");
   }
@@ -70,7 +74,7 @@ const getCSVData = (
   );
 };
 
-const sortData = (
+export const sortData = (
   data: EnrichedCity[],
   sortField: SortField,
   sortOrder: SortDirection
@@ -89,7 +93,28 @@ const sortData = (
   });
 };
 
-module.exports = {
-  getData,
-  sortData,
+export const saveEntry = async (city: City) => {
+  const filePaths = {
+    json: path.join(__dirname, `../data/cities/cities.json`),
+    csv: path.join(__dirname, `../data/cities/cities.csv`),
+  };
+
+  const { name, area, population } = city;
+
+  var jsonData = fs.readFileSync(filePaths.json);
+  var parsedJsonData = JSON.parse(jsonData);
+  parsedJsonData.push(city);
+
+  try {
+    await fs.promises.writeFile(filePaths.json, JSON.stringify(parsedJsonData));
+  } catch (error) {
+    console.log(error);
+  }
+
+  const cityLine = `${name};${area};${population}\n`;
+  try {
+    fs.appendFileSync(filePaths.csv, cityLine);
+  } catch (error) {
+    console.log(error);
+  }
 };

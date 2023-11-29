@@ -70,12 +70,10 @@ const buildFileName = (endpoint, type, queryParams = {}) => {
   const filePath = `json/${endpoint}/${fileName}`;
   const fullPath = path.join(__dirname, filePath);
 
-  console.log(fullPath);
-
   return fullPath;
 };
 
-const getRequest = (endpoint, type, lengthOfResult, queryParams) =>
+const getRequest = async (endpoint, type, lengthOfResult, queryParams) =>
   request(app)
     .get(buildRequestUri(endpoint, queryParams))
     .expect("Content-Type", /json/)
