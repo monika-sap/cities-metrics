@@ -2,6 +2,7 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import { getData, sortData, saveEntry } from "./utils.js";
 import { SortDirection, City, EnrichedCity, CitiesQueryParams } from "./types";
@@ -10,6 +11,14 @@ dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT;
+
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 app.get(
   "/api/cities",

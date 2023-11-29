@@ -2,6 +2,23 @@
 
 A coding challenge solution
 
+## Setup
+
+```
+npm run setup // installs necessary packages
+```
+
+create an `.env` file in the `server` directory that contains the following data
+PORT=8000 // or whichever port you see fit
+
+and an `.env` file in the `client` directory that contains the following data
+REACT_APP_API_URL=http://192.168.1.11:800/api // or the local ip the server is running, if using wsl execute `ip addr` and lookup the eth0 interface's ip
+REACT_APP_HIGHLIGHT_THRESHOLD=1000000
+
+```
+npm run dev
+```
+
 ## Server
 
 - server/index.js: Initializes an Express server and defines the `/api/cities` endpoint.
