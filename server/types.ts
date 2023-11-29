@@ -8,6 +8,14 @@ export interface EnrichedCity extends City {
   density: number;
 }
 
+export interface CitiesQueryParams {
+  fileType?: string;
+  fileName?: string;
+  sort?: SortField;
+  order?: SortDirection;
+  nameContains?: string;
+}
+
 export enum SortDirection {
   ASC,
   DESC,
