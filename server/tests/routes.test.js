@@ -3,7 +3,7 @@ const { getRequest, getAllSortings, filteringStrings } = require("./utils.js");
 describe("GET /api/cities", () => {
   const ENDPOINT = "/api/cities";
 
-  it("should receive correct result", () =>
+  it("should receive correct result", async () =>
     getRequest(ENDPOINT, "default", 215));
 
   it.each(getAllSortings())(
@@ -14,7 +14,7 @@ describe("GET /api/cities", () => {
 
   it.each(filteringStrings)(
     "should receive correct result when filtering %p",
-    ({ nameContains, lengthOfResult }) =>
+    async ({ nameContains, lengthOfResult }) =>
       getRequest(ENDPOINT, "filtering", lengthOfResult, { nameContains })
   );
 });

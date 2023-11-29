@@ -1,8 +1,10 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
+import asyncHandler from "express-async-handler";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import { SortDirection, City, CitiesQueryParams } from "./types";
-const asyncHandler = require("express-async-handler");
-const utils = require("./utils.js");
+
+import { getData, sortData, saveEntry } from "./utils.js";
+import { SortDirection, City, EnrichedCity, CitiesQueryParams } from "./types";
 
 dotenv.config();
 
@@ -18,18 +20,18 @@ app.get(
     let headerFileType = req.get("Content-Type");
     headerFileType = headerFileType?.slice(headerFileType?.indexOf("/") + 1);
 
-    let data = [];
+    let data: EnrichedCity[] = [];
     try {
-      data = await utils.getData(
+      data = (await getData(
         fileName || "cities",
         fileType || headerFileType
-      );
+      )) as EnrichedCity[];
     } catch ({ message }: any) {
       res.send(`${message}`);
     }
 
     if (!!sort) {
-      data = utils.sortData(data, sort, order || SortDirection.ASC);
+      data = sortData(data, sort, order || SortDirection.ASC);
     }
 
     if (!!nameContains) {
@@ -40,6 +42,25 @@ app.get(
     }
 
     res.json(data);
+  })
+);
+
+app.use(bodyParser.json());
+
+app.post(
+  "/api/cities/add",
+  asyncHandler(async (req: Request, res: Response) => {
+    const { name, population, area } = req.body;
+
+    if (!name || !population || !area) {
+      res.status(400).send("Missing required fields");
+      return;
+    }
+
+    const newCity = { name, population, area } as City;
+    await saveEntry(newCity);
+
+    res.status(201).send("Entry added");
   })
 );
 
