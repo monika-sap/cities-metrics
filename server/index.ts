@@ -1,6 +1,6 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import { SortDirection } from "./types";
+import { SortDirection, City, CitiesQueryParams } from "./types";
 const asyncHandler = require("express-async-handler");
 const utils = require("./utils.js");
 
@@ -12,7 +12,8 @@ const port = process.env.PORT;
 app.get(
   "/api/cities",
   asyncHandler(async (req: Request, res: Response) => {
-    const { fileType, fileName, sort, order } = req.query;
+    const { fileType, fileName, sort, order, nameContains }: CitiesQueryParams =
+      req.query;
 
     let headerFileType = req.get("Content-Type");
     headerFileType = headerFileType?.slice(headerFileType?.indexOf("/") + 1);
@@ -28,10 +29,13 @@ app.get(
     }
 
     if (!!sort) {
-      data = utils.sortData(
-        data,
-        sort,
-        ((order as string) || "").toUpperCase() || SortDirection.ASC
+      data = utils.sortData(data, sort, order || SortDirection.ASC);
+    }
+
+    if (!!nameContains) {
+      const filterText = nameContains.toLowerCase();
+      data = data.filter(({ name }: City) =>
+        name.toLowerCase().includes(filterText)
       );
     }
 

@@ -1,67 +1,20 @@
-const request = require("supertest");
-const fs = require("fs");
-const app = require("../dist/index.js");
-const { sortableFields, SortDirection } = require("../dist/types.js");
-
-const getAllSortings = () => {
-  const sortDirections = Object.values(SortDirection).filter((v) =>
-    isNaN(Number(v))
-  );
-
-  const allSortings = [];
-
-  sortableFields.forEach((sort) => {
-    sortDirections.forEach((order) => {
-      allSortings.push({
-        sort,
-        order,
-      });
-    });
-  });
-
-  return allSortings;
-};
+const { getRequest, getAllSortings, filteringStrings } = require("./utils.js");
 
 describe("GET /api/cities", () => {
-  it("should receive correct result", () => {
-    return request(app)
-      .get("/api/cities")
-      .expect("Content-Type", /json/)
-      .expect(200)
-      .then((res) => {
-        expect(res.statusCode).toBe(200);
-        expect(res.body.length).toBe(215);
+  const ENDPOINT = "/api/cities";
 
-        fs.readFile("tests/results.json", function (err, data) {
-          if (err) {
-            throw new Error(err);
-          }
-          expect(res.body).toMatchObject(JSON.parse(data));
-        });
-      });
-  });
+  it("should receive correct result", () =>
+    getRequest(ENDPOINT, "default", 215));
 
   it.each(getAllSortings())(
     "should receive correct sorted data by %p",
-    async ({ sort, order }) => {
-      return request(app)
-        .get(`/api/cities?sort=${sort}&order=${order}`)
-        .expect("Content-Type", /json/)
-        .expect(200)
-        .then((res) => {
-          expect(res.statusCode).toBe(200);
-          expect(res.body.length).toBe(215);
+    async ({ sort, order }) =>
+      getRequest(ENDPOINT, "sorting", 215, { sort, order })
+  );
 
-          fs.readFile(
-            `tests/sortedResults-${sort}-${order}.json`,
-            function (err, data) {
-              if (err) {
-                throw new Error(err);
-              }
-              expect(res.body).toMatchObject(JSON.parse(data));
-            }
-          );
-        });
-    }
+  it.each(filteringStrings)(
+    "should receive correct result when filtering %p",
+    ({ nameContains, lengthOfResult }) =>
+      getRequest(ENDPOINT, "filtering", lengthOfResult, { nameContains })
   );
 });

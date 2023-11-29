@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Chicago",
+    "area": 227.3,
+    "population": 2705994,
+    "density": 4596.52
+  },
+  {
+    "name": "Wichita",
+    "area": 159.3,
+    "population": 389255,
+    "density": 943.45
+  }
+]
