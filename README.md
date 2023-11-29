@@ -20,6 +20,7 @@ REACT_APP_HIGHLIGHT_THRESHOLD=1000000
 ```
 npm run dev // should run bot server and client
 ```
+Enhancement could be some containerization, more and robust tests, and better error handling.
 
 ## Server
 
