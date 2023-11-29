@@ -8,7 +8,7 @@ A coding challenge solution
 
 ### Endpoints
 
-- GET `/api/cities`: Returns a list of cities. The data is read from cities.json file located in the project root and enriched with a population `density` field.
+- GET `/api/cities`: Returns a list of cities. The data is read from cities.json file located in the project root and enriched with a population `density` field. Accepts sort and order query parameters. Valid sort fields are name, population, and area. The order can be ASC or DESC.
 
 #### Parameters
 
