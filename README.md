@@ -20,6 +20,8 @@ REACT_APP_HIGHLIGHT_THRESHOLD=1000000
 ```
 npm run dev // should run bot server and client
 ```
+Default react app port is not changed so open `localhost:3000` in the browser if not automatically done.
+
 Enhancement could be some containerization, more and robust tests, and better error handling.
 
 ## Server
